@@ -1,0 +1,25 @@
+# WAI
+wai_k8s_deployment_dir: /opt/data/scripts/wai-api
+wai_k8s_namespaces:
+  - wai-prod
+  - wai-play
+  - wai-stag
+
+  # Base fqdn domain
+wai_base_domain:
+  wai-prod: webanalytics.italia.it
+  wai-play: play.webanalytics.italia.it
+  wai-stag: staging.webanalytics.italia.it
+
+# Hostnames
+wai_hostname: { ingestion: ingestion, portal: www, api: api }
+
+# CACHE
+wai_cache_image: webanalyticsitalia/wai-cache
+wai_cache_image_tag: 1.0.0-beta
+
+# Kubectl executable
+wai_kubectl: /usr/local/bin/kubectl
+
+# Portal image
+wai_portal_matomo_sub_path: /matomo

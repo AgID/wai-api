@@ -1,0 +1,35 @@
+version: '3.7'
+
+networks:
+  cache:
+    driver: bridge
+
+services:
+  wai-cache:
+    image: wai-cache:dev
+    build:
+      context: ./wai-cache
+    volumes:
+      - ./wai-cache/varnish:/etc/varnish
+    networks:
+      - cache
+  nginx:
+    image: nginx:1.17.7
+    volumes:
+      - ./wai-cache/nginx:/etc/nginx/conf.d
+    ports:
+      - 443:443
+    networks:
+      - cache
+  portal-service:
+    image: nginx:1.17.7
+    volumes:
+      - ./wai-cache/portal-service:/etc/nginx/conf.d
+    networks:
+      - cache
+  matomo-service:
+    image: nginx:1.17.7
+    volumes:
+      - ./wai-cache/matomo-service:/etc/nginx/conf.d
+    networks:
+      - cache

@@ -1,0 +1,25 @@
+---
+# Compile K8S resources templates
+- name: K8S .:. Create destination directories
+  file:
+    path: "{{ wai_k8s_deployment_dir }}/{{ item }}"
+    state: directory
+  with_items: "{{ wai_k8s_namespaces }}"
+
+- name: K8S .:. Calculate namespace dependant objects
+  set_fact:
+    namespace_file: "{{ namespace_file | default([]) + [ item ] }}"
+  with_fileglob:
+    - templates/k8s/namespace/*.j2
+
+- name: K8S .:. Prepare namespace dependant deployment
+  vars:
+    item: "{{ filevar[0] }}"
+  template:
+    src: "{{ filevar[1] }}"
+    dest : "{{ wai_k8s_deployment_dir }}/{{ filevar[0] }}/{{ filevar[1] | basename | regex_replace('.j2','') }}"
+  with_nested:
+    - "{{ wai_k8s_namespaces }}"
+    - "{{ namespace_file }}"
+  loop_control:
+    loop_var: filevar
