@@ -5,6 +5,7 @@ networks:
     driver: bridge
 
 services:
+
   wai-cache:
     image: wai-cache:dev
     build:
@@ -13,6 +14,7 @@ services:
       - ./wai-cache/varnish:/etc/varnish
     networks:
       - cache
+
   nginx:
     image: nginx:1.17.7
     volumes:
@@ -21,12 +23,14 @@ services:
       - 443:443
     networks:
       - cache
+
   portal-service:
     image: nginx:1.17.7
     volumes:
       - ./wai-cache/portal-service:/etc/nginx/conf.d
     networks:
       - cache
+
   matomo-service:
     image: nginx:1.17.7
     volumes:
