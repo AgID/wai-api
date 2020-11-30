@@ -1,0 +1,36 @@
+{
+  "name": "wai-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec babel-node src",
+    "build": "npm run clean && npm run build-js",
+    "build-js": "babel src --out-dir dist",
+    "start": "node ./dist/index.js",
+    "clean": "rm -rf ./dist && mkdir dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src"
+  },
+  "author": "Giampaolo Fois",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "core-js": "^3.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "isomorphic-fetch": "^3.0.0",
+    "nodemon": "^2.0.6",
+    "regenerator-runtime": "^0.13.7"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/node": "^7.12.6",
+    "@babel/preset-env": "^7.12.1",
+    "babel-plugin-macros": "^3.0.0",
+    "eslint": "^7.14.0",
+    "yaml.macro": "^0.1.1"
+  }
+}

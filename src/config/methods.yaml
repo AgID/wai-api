@@ -1,0 +1,10 @@
+#Matomo allowed modules and methods
+#To force a recompile of the yaml in dev mode edit the comment in config.js
+
+enabledModules:
+  module:
+    - name: api
+      methods:
+        - API.getBulkRequest
+        - API.getMatomoVersion
+        - SitesManager.getSiteUrlsFromId
