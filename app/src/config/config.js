@@ -7,6 +7,11 @@ import yaml from "yaml.macro";
     https://github.com/kentcdodds/babel-plugin-macros#babel-cache-problem
 */
 
+/**
+ * @namespace
+ * @alias config              - Contains all configs in yaml and json format 
+ * @property {object} matomo  - Allowed modules and methods for matomo queries
+ */
 const config = {
   matomo: yaml("./methods.yaml"),
 };

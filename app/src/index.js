@@ -17,6 +17,6 @@ app.use((req, res)=>{
   res.status(404).json({ error: "Not Found" });
 });
 
-app.listen(5000, () => {
-  console.log(`app is listening to port 5000`);
+app.listen(process.env.PORT, () => {
+  console.log(`app is listening to port ${process.env.PORT}`);
 });

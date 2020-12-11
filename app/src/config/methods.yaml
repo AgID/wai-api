@@ -8,3 +8,4 @@ enabledModules:
         - API.getBulkRequest
         - API.getMatomoVersion
         - SitesManager.getSiteUrlsFromId
+        - API.getWidgetMetadata
