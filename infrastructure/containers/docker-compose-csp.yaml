@@ -1,0 +1,25 @@
+version: '3.7'
+
+networks:
+  csp:
+    driver: bridge
+
+services:
+
+  matomo-nginx:
+    build: ./wai-csp/matomo-nginx
+    volumes:
+      - ./wai-csp/matomo-nginx/conf:/usr/local/openresty/nginx/conf
+      - ./wai-csp/matomo-nginx/lua:/usr/local/openresty/lualib/wai
+      - ./wai-csp/matomo-nginx/html:/usr/local/openresty/nginx/html
+    ports:
+        - 18080:80
+    networks:
+      - csp
+
+  redis:
+    image: bitnami/redis:5.0.10
+    environment: 
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - csp
