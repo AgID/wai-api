@@ -14,6 +14,12 @@ wai_base_domain:
 # Hostnames
 wai_hostname: { ingestion: ingestion, portal: www, api: api }
 
+# Matomo POD size configuration
+wai_matomo_pod_size:
+  wai-prod: { wai-portal: 4, wai-reporting: 4, wai-api: 4, matomo-portal: 4, matomo-worker: 8, matomo-ingestion: 8, matomo-api: 4 }
+  wai-play: { wai-portal: 4, wai-reporting: 4, wai-api: 4, matomo-portal: 4, matomo-worker: 8, matomo-ingestion: 8, matomo-api: 4 }
+  wai-stag: { wai-portal: 2, wai-reporting: 2, wai-api: 2, matomo-portal: 2, matomo-worker: 2, matomo-ingestion: 2, matomo-api: 2 }
+
 # CACHE
 wai_cache_image: webanalyticsitalia/wai-cache
 wai_cache_image_tag: 1.0.0-beta
@@ -23,3 +29,10 @@ wai_kubectl: /usr/local/bin/kubectl
 
 # Portal image
 wai_portal_matomo_sub_path: /matomo
+
+# Matomo Image
+wai_matomo_image: webanalyticsitalia/wai-matomo
+wai_matomo_image_tag: 3.14.1
+
+wai_nginx_matomo_api_image: webanalyticsitalia/wai-openresty
+wai_nginx_matomo_api_image_tag: 1.0.0

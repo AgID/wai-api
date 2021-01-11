@@ -1,0 +1,240 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: wai-api-nginx-configmap
+  namespace: {{ item }}
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes 1;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+
+    events {
+    worker_connections 2048;
+    }
+
+    http {
+    server_tokens off;
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 15s;
+    types_hash_max_size 2048;
+
+    upstream backend {
+        server localhost:9000;
+    }
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    gzip on;
+    gzip_disable "msie6";
+
+    server {
+        listen 80;
+        root /var/www/html/;
+
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+        add_header Referrer-Policy origin;
+        add_header Content-Security-Policy "frame-ancestors https://api.{{ wai_base_domain[item] }}";
+
+        index index.php;
+
+        location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+        }
+
+        location = /index.php {
+        access_by_lua_block {
+          local opts = {
+            defaultCsp = "https://api.{{ wai_base_domain[item] }}",
+            redis = {              
+              url = "redis://{{ redis_password.application_redis_master[item] }}@application-redis-master:6379/9",
+              sentinels = {}
+            }
+          }
+          require("wai.wai-csp").evaluate(opts)
+        }
+        fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+        fastcgi_param  SERVER_SOFTWARE    nginx;
+        fastcgi_param  QUERY_STRING       $query_string;
+        fastcgi_param  REQUEST_METHOD     $request_method;
+        fastcgi_param  CONTENT_TYPE       $content_type;
+        fastcgi_param  CONTENT_LENGTH     $content_length;
+        fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+        fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+        fastcgi_param  REQUEST_URI        $request_uri;
+        fastcgi_param  DOCUMENT_URI       $document_uri;
+        fastcgi_param  DOCUMENT_ROOT      $document_root;
+        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+        fastcgi_param  REMOTE_ADDR        $remote_addr;
+        fastcgi_param  REMOTE_PORT        $remote_port;
+        fastcgi_param  SERVER_ADDR        $server_addr;
+        fastcgi_param  SERVER_PORT        $server_port;
+        fastcgi_param  SERVER_NAME        $server_name;
+        fastcgi_param  HTTP_X_FORWARDED_URI '{{ wai_portal_matomo_sub_path }}';
+        fastcgi_intercept_errors on;
+        fastcgi_pass backend;
+        }
+
+
+        location = /matomo.js {
+        allow all;
+        ## Cache matomo javascript tracking code
+        expires 1h;
+        add_header Pragma public;
+        add_header Cache-Control "public";
+        }
+
+        location ~* / {
+        deny all;
+        return 404;
+        }
+        access_log /var/log/nginx/access.log combined if=$loggable;
+    }
+
+    map $uri $basename {
+        ~/(?<captured_basename>[^/]*)$ $captured_basename;
+    }
+
+    # don't log access to matomo|piwik.js
+    map $basename $loggable {
+        matomo.js 0;
+        piwik.js 0;
+        default 1;
+    }
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: matomo-api
+  namespace: {{ item }}
+spec:
+  replicas: {{ wai_matomo_pod_size[item]['wai-api'] }}
+  selector:
+    matchLabels:
+      app: matomo-api
+  template:
+    metadata:
+      labels:
+        app: matomo-api
+    spec:
+      volumes:
+        - name: matomo-api-config
+          configMap:
+            name: matomo-php-config
+            defaultMode: 420
+        - name: matomo-api-initc-config
+          configMap:
+            name: matomo-initc-config
+            defaultMode: 420
+        - name: matomo-api-nginx-conf
+          configMap:
+            name: matomo-api-nginx-configmap
+            defaultMode: 420
+        - name: matomo-api-extra-content
+          persistentVolumeClaim:
+            claimName: matomo-extra-content-pvc
+        - name: html
+          emptyDir: {}
+      initContainers:
+        - name: copy
+          image: {{ wai_matomo_image }}:{{ 'latest' if item == 'wai-stag' else wai_matomo_image_tag }}
+          imagePullPolicy: {{ 'Always' if item == 'wai-stag' else 'IfNotPresent' }}
+          command:
+            - sh
+            - '-c'
+            - . /entrypoint.sh
+          resources:
+            limits:
+              cpu: 100m
+              memory: 50Mi
+          volumeMounts:
+            - name: html
+              mountPath: /html
+            - name: matomo-api-config
+              mountPath: /tmp/config.ini.php.orig
+              subPath: config.ini.php
+            - name: matomo-api-initc-config
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+            - name: matomo-api-extra-content
+              mountPath: /opt/extra-content
+      containers:
+        - name: matomo-api
+          image: {{ wai_matomo_image }}:{{ 'latest' if item == 'wai-stag' else wai_matomo_image_tag }}
+          imagePullPolicy: {{ 'Always' if item == 'wai-stag' else 'IfNotPresent' }}
+          ports:
+            - name: fpm-port
+              containerPort: 9000
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 750m
+              memory: 250Mi
+          volumeMounts:
+            - name: html
+              mountPath: /var/www/html/
+            - name: matomo-api-extra-content
+              mountPath: /opt/extra-content
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /var/www/html/config/config.ini.php
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+        - name: nginx
+          image: {{ wai_nginx_matomo_api_image }}:{{ 'latest' if item == 'wai-stag' else wai_nginx_matomo_api_image_tag }}
+          imagePullPolicy: {{ 'Always' if item == 'wai-stag' else 'IfNotPresent' }}
+          args:
+            - nginx
+            - '-g'
+            - daemon off;
+            - '-c'
+            - /etc/config/nginx.conf
+          ports:
+            - name: nginx
+              containerPort: 80
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: matomo-api-nginx-conf
+              mountPath: /etc/config/
+            - name: html
+              mountPath: /var/www/html
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3          
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - matomo-api
+              topologyKey: kubernetes.io/hostname
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
