@@ -5,7 +5,9 @@ enabledModules:
   module:
     - name: api
       methods:
-        - API.getBulkRequest
-        - API.getMatomoVersion
-        - SitesManager.getSiteUrlsFromId
-        - API.getWidgetMetadata
+        - API.getBulkRequest|R
+        - API.getMatomoVersion|W
+        - SitesManager.getSiteUrlsFromId|W
+        - API.getWidgetMetadata|R
+publicMethods:
+  - API.getBulkRequest
