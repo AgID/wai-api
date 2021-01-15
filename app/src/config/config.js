@@ -7,6 +7,11 @@ import yaml from "yaml.macro";
     https://github.com/kentcdodds/babel-plugin-macros#babel-cache-problem
 */
 
+/* 
+  For TESTS:
+  If you edit any config file you should clear Jest cache by running npm run clear-test-cache
+*/
+
 /**
  * @namespace
  * @alias config              - Contains all configs in yaml and json format 

@@ -2,5 +2,9 @@
     "presets": [
       "@babel/preset-env"
     ],
-    "plugins": ["macros"]
+    "plugins": ["macros"],
+    "ignore": [
+      "**/tests", 
+      "**/*.test.js"
+    ]
  }
