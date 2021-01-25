@@ -7,7 +7,7 @@
     "dev": "nodemon --exec NODE_ENV=dev babel-node src",
     "build": "npm run clean && npm run build-js",
     "build-js": "babel src --out-dir dist",
-    "start": "node ./dist/index.js",
+    "start": "docker build -t wai-api . && docker run -p 7080:7080 -d wai-api",
     "clean": "rm -rf ./dist && mkdir dist",
     "test": "jest --forceExit",
     "clear-test-cache": "jest --clearCache",

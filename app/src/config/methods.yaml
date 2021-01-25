@@ -9,7 +9,7 @@ enabledModules:
         - API.getMatomoVersion|W
         - SitesManager.getSiteUrlsFromId|W
         - API.getWidgetMetadata|R
-    #For testing purpose only
+    #For testing purposes only
     - name: test
       methods:
         - API.test|W

@@ -1,13 +1,29 @@
 # Web Analytics Italia API
 
 ## Development
-- Start development server:
-    ```
+
+### Development requirements
+
+- Node
+- [Wai Portal](https://github.com/AgID/wai-portal) Kong service
+
+### Starting the develop server
+
+    ```bash
+    npm install
     npm run dev
     ```
+
 ## Production
-- Start production server:
-    ```
-    npm run build
+
+### Production requirements
+
+- Node
+- [Wai Portal](https://github.com/AgID/wai-portal) Kong service
+- Docker
+
+### Starting the production server
+
+    ```bash
     npm start
     ```
