@@ -9,10 +9,10 @@
 
 ### Starting the develop server
 
-    ```
-    npm install
-    npm run dev
-    ```
+```
+npm install
+npm run dev
+```
 
 ## Production
 
@@ -24,6 +24,6 @@
 
 ### Starting the production server
 
-    ```
-    npm start
-    ```
+```
+npm start
+```
