@@ -9,7 +9,7 @@
 
 ### Starting the develop server
 
-    ```bash
+    ```
     npm install
     npm run dev
     ```
@@ -24,6 +24,6 @@
 
 ### Starting the production server
 
-    ```bash
+    ```
     npm start
     ```
