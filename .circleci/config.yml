@@ -31,6 +31,9 @@ jobs:
       - run:
           name: Run tests
           command: npm test
+      - run:
+          name: Run Build
+          command: npm run build
 
 workflows:
   # Below is the definition of your workflow.
