@@ -1,0 +1,8 @@
+version: "3.7" 
+services:
+  express:
+    image: wai-express-api
+    build:
+      context: .
+    ports:
+      - "${PORT_PROD}:${PORT_PROD}"
