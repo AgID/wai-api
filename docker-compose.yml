@@ -1,7 +1,7 @@
 version: "3.7" 
 services:
   express:
-    image: wai-express-api
+    image: wai-express-api:dev
     build:
       context: .
     ports:
