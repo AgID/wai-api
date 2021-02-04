@@ -23,6 +23,3 @@ COPY --from=builder /home/node/app/node_modules ./node_modules
 COPY --from=deps /home/node/app/package.json ./
 
 CMD [ "node", "./dist/index.js" ]
-
-
-
