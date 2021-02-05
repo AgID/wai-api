@@ -1,10 +1,10 @@
 {
-    "presets": [
-      "@babel/preset-env"
-    ],
-    "plugins": ["macros"],
-    "ignore": [
-      "**/tests", 
-      "**/*.test.js"
-    ]
- }
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "plugins": ["macros"],
+  "ignore": [
+    "**/tests", 
+    "**/*.test.js"
+  ]
+}

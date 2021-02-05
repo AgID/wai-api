@@ -1,7 +1,5 @@
-node_modules
-dist
-tests
-jest.*
-.gitignore
-.dockerignore
-README.md
+*
+!src
+!package*.json
+!.env
+!.babelrc

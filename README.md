@@ -5,7 +5,7 @@
 ### Development requirements
 
 - Node
-- [Wai Portal](https://github.com/AgID/wai-portal) Kong service
+- [WAI Portal](https://github.com/AgID/wai-portal) Kong service
 
 ### Starting the develop server
 
@@ -19,7 +19,7 @@ npm run dev
 ### Production requirements
 
 - Node
-- [Wai Portal](https://github.com/AgID/wai-portal) Kong service
+- [WAI Portal](https://github.com/AgID/wai-portal) Kong service
 - Docker
 
 ### Starting the production server

@@ -13,4 +13,5 @@ route.get("/modules", async (req, res) => {
     return res.status(200).json(config.matomo);
   return res.status(404).json({"Error": "Not Found"});
 });
+
 export default route;
