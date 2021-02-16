@@ -1,4 +1,13 @@
-version: "3.7" 
+version: "3.7"
+
+networks:
+  frontend:
+    external: true
+    name: wai_frontend
+  backend:
+    external: true
+    name: wai_backend
+
 services:
   express:
     image: wai-express-api:dev
@@ -6,3 +15,6 @@ services:
       context: .
     ports:
       - "${PORT_PROD}:${PORT_PROD}"
+    networks:
+      - frontend
+      - backend
