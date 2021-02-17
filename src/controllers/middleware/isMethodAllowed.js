@@ -16,24 +16,27 @@ export default (module, method, permission) => {
 
   const allowMethod = Array.isArray(allowModule?.methods)
     ? allowModule?.methods.find((elem) => {
-      const elemMethod = elem.split("|");
+        const elemMethod = elem.split("|");
 
-      return elemMethod[0].toLowerCase() === method.toLowerCase();
-    })
+        return elemMethod[0].toLowerCase() === method.toLowerCase();
+      })
     : false;
 
-  if (!allowMethod)
-    return { error: true, message: "Method not allowed" };
+  if (!allowMethod) return { error: true, message: "Method not allowed" };
 
   const getPermission = allowMethod ? allowMethod.split("|") : [];
 
-  const isAllowedPermission = permission.includes(getPermission[1]);
+  const isAllowedPermission =
+    permission === "admin" || getPermission[1] === permission[0];
 
   if (!isAllowedPermission)
     return {
       error: true,
-      message: "Not enough permission to access the method: " + method,
+      message:
+        "Not allowed to access the method '" +
+        method +
+        "' with the current permission settings",
     };
 
   return { error: false };
-}
+};

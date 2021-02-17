@@ -17,6 +17,8 @@ FROM node:lts-alpine AS runner
 WORKDIR /home/node/app
 ENV PORT_PROD=7080
 ENV NODE_ENV=production
+ENV ANALYTICS_PUBLIC_URL=https://nginx:9443
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 EXPOSE 7080
 COPY --from=builder /home/node/app/dist ./dist
 COPY --from=builder /home/node/app/node_modules ./node_modules

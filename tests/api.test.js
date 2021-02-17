@@ -28,14 +28,14 @@ describe("API Tests", function () {
 
   it("test index", async () => {
     const res = await request(app).get("/");
-    const response = { error: "no Module or Method specified" };
+    const response = { error: "Failed to find credential" };
     expect(res.status).toBe(403);
     expect(res.body).toEqual(response);
   });
 
   it("valid queryString, no headers", async () => {
     const res = await request(app).get("/?" + queryParsed);
-    const response = { error: "Not Allowed" };
+    const response = { error: "Failed to find credential" };
     expect(res.status).toBe(403);
     expect(res.body).toEqual(response);
   });
@@ -60,6 +60,7 @@ describe("API Tests", function () {
   });
 
   it("valid headers no write permission", async () => {
+    customId.siteId = [];
     customId.siteId.push({
       id: 1,
       permission: "R",
@@ -69,16 +70,17 @@ describe("API Tests", function () {
       .get("/?" + queryParsed)
       .set("x-consumer-custom-id", JSON.stringify(customId));
     const response = {
-      error: "Not enough permission to access the method: " + query.method,
+      error: "Not allowed to access the method '" + query.method + "' with the current permission settings",
     };
     expect(res.status).toBe(403);
     expect(res.body).toEqual(response);
   });
 
   it("valid headers, valid permission", async () => {
+    customId.siteId = [];
     customId.siteId.push({
       id: 1,
-      permission: "W",
+      permission: "RW",
     });
 
     const res = await request(app)

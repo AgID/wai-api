@@ -6,13 +6,13 @@ enabledModules:
     - name: api
       methods:
         - API.getBulkRequest|R
-        - API.getMatomoVersion|W
-        - SitesManager.getSiteUrlsFromId|W
+        - API.getMatomoVersion|RW
+        - SitesManager.getSiteUrlsFromId|RW
         - API.getWidgetMetadata|R
     #For testing purposes only
     - name: test
       methods:
-        - API.test|W
-        - API.testWrite|W
+        - API.test|RW
+        - API.testWrite|RW
 publicMethods:
   - API.getBulkRequest
