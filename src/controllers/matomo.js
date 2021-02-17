@@ -18,7 +18,7 @@ export default async (req, res) => {
   if (!isModulePublic) {
     const isAllowedUser = isUserAllowed(
       req.headers,
-      parseInt(idSite)
+      idSite
     );
 
     if (isAllowedUser.error === true)
