@@ -12,11 +12,13 @@ export default async (req, res) => {
           elem.toLowerCase() === req.query?.method.toLowerCase()
       )
     : false;
+  
+  const idSite = req.query?.idSite ? parseInt(req.query.idSite) : -1
 
   if (!isModulePublic) {
     const isAllowedUser = isUserAllowed(
       req.headers,
-      parseInt(req.query?.idSite)
+      parseInt(idSite)
     );
 
     if (isAllowedUser.error === true)
