@@ -1,19 +1,19 @@
 export default (headers, idSite) => {
-  if (isNaN(idSite)) return { error: true, message: "idSite not valid" };
+  if (Number.isNaN(idSite)) return { error: true, message: 'idSite not valid' };
 
-  const consumerCustomId = headers["x-consumer-custom-id"];
+  const consumerCustomId = headers['x-consumer-custom-id'];
 
-  if (typeof consumerCustomId === "string") {
+  if (typeof consumerCustomId === 'string') {
     let customId;
     let idList;
     let permissions;
 
     try {
-      customId = JSON.parse(headers["x-consumer-custom-id"]);
+      customId = JSON.parse(headers['x-consumer-custom-id']);
 
-      if (customId.type === "admin") {
+      if (customId.type === 'admin') {
         idList = [];
-        permissions = "admin";
+        permissions = 'admin';
       } else {
         idList = Array.isArray(customId.siteId)
           ? { ...customId }.siteId.map((elem) => elem.id)
@@ -23,23 +23,22 @@ export default (headers, idSite) => {
           : undefined;
       }
     } catch (error) {
-      console.log("Error parsing json", error);
       return {
         error: true,
-        message: "x-consumer-custom-id must be in JSON format",
+        message: 'x-consumer-custom-id must be in JSON format',
       };
     }
 
     if (
-      idSite < 0 ||
-      permissions === "admin" ||
-      (Array.isArray(idList) && idList.includes(idSite))
+      idSite < 0
+      || permissions === 'admin'
+      || (Array.isArray(idList) && idList.includes(idSite))
     ) {
       return { error: false, permission: permissions };
     }
   }
   return {
     error: true,
-    message: "Failed to find credential",
+    message: 'Failed to find credential',
   };
 };
