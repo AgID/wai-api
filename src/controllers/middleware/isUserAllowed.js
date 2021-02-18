@@ -1,44 +1,44 @@
 export default (headers, idSite) => {
-  if (Number.isNaN(idSite)) return { error: true, message: 'idSite not valid' };
+  if (Number.isNaN(idSite)) return { error: true, message: "idSite not valid" };
 
-  const consumerCustomId = headers['x-consumer-custom-id'];
+  const consumerCustomId = headers["x-consumer-custom-id"];
 
-  if (typeof consumerCustomId === 'string') {
+  if (typeof consumerCustomId === "string") {
     let customId;
-    let idList;
-    let permissions;
+    let permission;
 
     try {
-      customId = JSON.parse(headers['x-consumer-custom-id']);
+      customId = JSON.parse(headers["x-consumer-custom-id"]);
+      const isAdmin = customId.type === "admin";
+      const hasIdList = Array.isArray(customId.siteId);
 
-      if (customId.type === 'admin') {
-        idList = [];
-        permissions = 'admin';
+      if (isAdmin) {
+        permission = "admin";
+      } else if (!isAdmin && hasIdList){
+        if(idSite > 0){
+          permission = customId.siteId.find((elem) => elem.id === idSite);
+          permission = permission && permission.hasOwnProperty(permission) ? permission.permission : false
+        }
+        else{
+          permission = "R"
+        }
       } else {
-        idList = Array.isArray(customId.siteId)
-          ? { ...customId }.siteId.map((elem) => elem.id)
-          : undefined;
-        permissions = Array.isArray(customId.siteId)
-          ? { ...customId }.siteId.map((elem) => elem.permission)
-          : undefined;
+        permission = false;
       }
+      
     } catch (error) {
       return {
         error: true,
-        message: 'x-consumer-custom-id must be in JSON format',
+        message: "x-consumer-custom-id must be in JSON format",
       };
     }
 
-    if (
-      idSite < 0
-      || permissions === 'admin'
-      || (Array.isArray(idList) && idList.includes(idSite))
-    ) {
-      return { error: false, permission: permissions };
+    if (permission) {
+      return { error: false, permission: permission };
     }
   }
   return {
     error: true,
-    message: 'Failed to find credential',
+    message: "Failed to find credential",
   };
 };

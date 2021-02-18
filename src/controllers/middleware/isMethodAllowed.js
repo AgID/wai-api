@@ -1,40 +1,50 @@
-import config from '../../config/config';
+import config from "../../config/config";
 
-export default (module, method, permission) => {
-  if (!module || !method) return { error: true, message: 'no Module or Method specified' };
+export default (queryModule, QueryMethod, permission) => {
+  let error = {
+    error: true,
+    message: "",
+  };
+
+  if (!module[0] || !method[0]) {
+    error.message = 'no "module" or "method" specified';
+    return error;
+  }
 
   const matomoConfig = config.matomo;
 
-  const allowModule = Array.isArray(matomoConfig?.enabledModules?.module)
-    ? matomoConfig.enabledModules.module.find(
-      (elem) => elem.name.toLowerCase() === module.toLowerCase(),
-    )
-    : false;
+  if (matomoConfig?.enabled && Object.keys(matomoConfig.enabled).length > 0) {
+    error.message = 'no allowed "module" was found in the configuration file';
+    return error;
+  }
 
-  if (!allowModule) return { error: true, message: 'Module not allowed' };
+  for (const module of queryModule) {
+    const moduleKey = Object.keys(matomoConfig.enabled).find(
+      (elem) => elem.toLowerCase() === module.toLowerCase()
+    );
+    const moduleList = matomoConfig.enabled[moduleKey];
 
-  const allowMethod = Array.isArray(allowModule?.methods)
-    ? allowModule?.methods.find((elem) => {
-      const elemMethod = elem.split('|');
+    if (moduleList && Array.isArray(moduleList)) {
+      for (const method of QueryMethod) {
+        const methodKey = Object.keys(moduleList).find(
+          (elem) => elem.toLowerCase() === method.toLowerCase()
+        );
 
-      return elemMethod[0].toLowerCase() === method.toLowerCase();
-    })
-    : false;
+        if (moduleList[methodKey] && moduleList[methodKey] === permission) {
+          error.error = false;
+        } else {
+          error.message = `Can't access method "${elem}"`;
+          break;
+        }
+      }
+    } else {
+      error.message = `Module "${elem}" not allowed`;
+      break;
+    }
+  }
 
-  if (!allowMethod) return { error: true, message: 'Method not allowed' };
-
-  const getPermission = allowMethod ? allowMethod.split('|') : [];
-
-  const isAllowedPermission = permission === 'admin' || getPermission[1] === permission[0];
-
-  if (!isAllowedPermission) {
-    return {
-      error: true,
-      message:
-        `Not allowed to access the method '${
-          method
-        }' with the current permission settings`,
-    };
+  if (error.error) {
+    return error;
   }
 
   return { error: false };

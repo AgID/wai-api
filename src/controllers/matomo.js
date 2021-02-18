@@ -4,14 +4,19 @@ import isUserAllowed from './middleware/isUserAllowed';
 import isMethodAllowed from './middleware/isMethodAllowed';
 
 export default async (req, res) => {
-  const isModulePublic = Array.isArray(config.matomo?.publicMethods)
-    ? config.matomo.publicMethods.find(
-      (elem) => req.query?.method
-          && elem
-          && elem.toLowerCase() === req.query?.method.toLowerCase(),
-    )
-    : false;
+  let isModulePublic = false;
 
+  const methods = Array.isArray(req.query?.module) ? req.query.module : [req.query?.module]
+  const modules = Array.isArray(req.query?.method) ? req.query.method : [req.query?.method]
+
+  for(const elem of methods){
+    if(!config.matomo.publicMethods.includes(elem)){
+      isModulePublic = false;
+      break;
+    }
+    isModulePublic = true;
+  }
+  
   // eslint-disable-next-line radix
   const idSite = req.query?.idSite ? parseInt(req.query.idSite) : -1;
 
@@ -24,8 +29,8 @@ export default async (req, res) => {
     if (isAllowedUser.error === true) return res.status(403).json({ error: isAllowedUser.message });
 
     const isAllowedMethod = isMethodAllowed(
-      req.query?.module,
-      req.query?.method,
+      methods,
+      modules,
       isAllowedUser.permission,
     );
 
