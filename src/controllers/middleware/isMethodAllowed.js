@@ -1,44 +1,52 @@
-import config from "../../config/config";
+import config from '../../config/config';
 
-export default (queryModule, QueryMethod, permission) => {
-  let error = {
+export default (queryModule, queryMethod, permission) => {
+  const error = {
     error: true,
-    message: "",
+    message: '',
   };
 
-  if (!module[0] || !method[0]) {
+  if (!queryModule[0] || !queryMethod[0]) {
     error.message = 'no "module" or "method" specified';
     return error;
   }
 
   const matomoConfig = config.matomo;
 
-  if (matomoConfig?.enabled && Object.keys(matomoConfig.enabled).length > 0) {
-    error.message = 'no allowed "module" was found in the configuration file';
+  if (!matomoConfig?.enabled || Object.keys(matomoConfig.enabled).length < 1) {
+    error.message = 'no allowed \'module\' was found in the configuration file';
     return error;
   }
-
+  // eslint-disable-next-line
   for (const module of queryModule) {
     const moduleKey = Object.keys(matomoConfig.enabled).find(
-      (elem) => elem.toLowerCase() === module.toLowerCase()
+      (elem) => elem.toLowerCase() === module.toLowerCase(),
     );
     const moduleList = matomoConfig.enabled[moduleKey];
 
-    if (moduleList && Array.isArray(moduleList)) {
-      for (const method of QueryMethod) {
+    if (moduleList) {
+      // eslint-disable-next-line
+      for (const method of queryMethod) {
         const methodKey = Object.keys(moduleList).find(
-          (elem) => elem.toLowerCase() === method.toLowerCase()
+          (elem) => elem.toLowerCase() === method.toLowerCase(),
         );
 
-        if (moduleList[methodKey] && moduleList[methodKey] === permission) {
+        if (
+          moduleList[methodKey]
+          && (moduleList[methodKey] === permission
+            || permission === 'admin'
+            || permission === 'RW')
+        ) {
           error.error = false;
         } else {
-          error.message = `Can't access method "${elem}"`;
+          error.error = true;
+          error.message = `Can't access method "${method}"`;
           break;
         }
       }
     } else {
-      error.message = `Module "${elem}" not allowed`;
+      error.error = true;
+      error.message = `Module "${module}" not allowed`;
       break;
     }
   }

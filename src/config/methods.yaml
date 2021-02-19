@@ -6,7 +6,7 @@ enabled:
       API.getBulkRequest: R
       API.getMatomoVersion: R
       SitesManager.getSiteUrlsFromId: RW
-      API.getWidgetMetadata: R 
+      API.getWidgetMetadata: R
     #For testing purposes only
     test:
       API.test: RW

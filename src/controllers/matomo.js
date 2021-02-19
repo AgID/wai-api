@@ -6,17 +6,17 @@ import isMethodAllowed from './middleware/isMethodAllowed';
 export default async (req, res) => {
   let isModulePublic = false;
 
-  const methods = Array.isArray(req.query?.module) ? req.query.module : [req.query?.module]
-  const modules = Array.isArray(req.query?.method) ? req.query.method : [req.query?.method]
-
-  for(const elem of methods){
-    if(!config.matomo.publicMethods.includes(elem)){
+  const methods = Array.isArray(req.query?.module) ? req.query.module : [req.query?.module];
+  const modules = Array.isArray(req.query?.method) ? req.query.method : [req.query?.method];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const elem of methods) {
+    if (!config.matomo.publicMethods.includes(elem)) {
       isModulePublic = false;
       break;
     }
     isModulePublic = true;
   }
-  
+
   // eslint-disable-next-line radix
   const idSite = req.query?.idSite ? parseInt(req.query.idSite) : -1;
 
