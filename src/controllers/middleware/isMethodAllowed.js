@@ -14,7 +14,7 @@ export default (queryModule, queryMethod, permission) => {
   const matomoConfig = config.matomo;
 
   if (!matomoConfig?.enabled || Object.keys(matomoConfig.enabled).length < 1) {
-    error.message = 'no allowed \'module\' was found in the configuration file';
+    error.message = "no allowed 'module' was found in the configuration file";
     return error;
   }
   // eslint-disable-next-line
@@ -31,22 +31,24 @@ export default (queryModule, queryMethod, permission) => {
           (elem) => elem.toLowerCase() === method.toLowerCase(),
         );
 
-        if (
-          moduleList[methodKey]
-          && (moduleList[methodKey] === permission
-            || permission === 'admin'
-            || permission === 'RW')
-        ) {
+        if (!moduleList[methodKey]) {
+          error.error = true;
+          error.message = `Can't access method '${method}'`;
+          break;
+        }
+
+        if (moduleList[methodKey] === permission || permission === 'admin' || permission === 'RW') {
           error.error = false;
         } else {
           error.error = true;
-          error.message = `Can't access method "${method}"`;
+          error.message = `Not allowed to access method '${method}' with the current permission settings`;
           break;
         }
       }
+      if (error.error) break;
     } else {
       error.error = true;
-      error.message = `Module "${module}" not allowed`;
+      error.message = `Module '${module}' not allowed`;
       break;
     }
   }

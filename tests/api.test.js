@@ -71,7 +71,7 @@ describe('api tests', () => {
     const res = await request(app)
       .get(`/?${querystring.encode(testQuery)}`)
       .set('x-consumer-custom-id', JSON.stringify(customId));
-    const response = { error: 'Method not allowed' };
+    const response = { error: `Can't access method '${testQuery.method}'` };
     expect(res.status).toBe(403);
     expect(res.body).toStrictEqual(response);
   });
@@ -89,7 +89,7 @@ describe('api tests', () => {
       .get(`/?${queryParsed}`)
       .set('x-consumer-custom-id', JSON.stringify(customId));
     const response = {
-      error: `Not allowed to access the method '${query.method}' with the current permission settings`,
+      error: `Not allowed to access method '${query.method}' with the current permission settings`,
     };
     expect(res.status).toBe(403);
     expect(res.body).toStrictEqual(response);
