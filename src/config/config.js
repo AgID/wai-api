@@ -18,7 +18,7 @@ import yaml from 'yaml.macro';
  * @property {object} matomo  - Allowed modules and methods for matomo queries
  */
 const config = {
-  matomo: yaml('./methods.yaml'),
+  matomo: yaml('./config.yaml'),
 };
 
 export default config;
