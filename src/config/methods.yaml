@@ -2,16 +2,15 @@
 # To force a recompile of the yaml in dev mode edit the comment in config.js
 
 enabled:
-    api:
-      API.getBulkRequest: R
-      API.getMatomoVersion: R
-      SitesManager.getSiteUrlsFromId: RW
-      API.getWidgetMetadata: R
-    #For testing purposes only
-    test:
-      API.test: RW
-      API.testWrite: RW         
-# Methods that won't require authorization
-# Comment to disable
+  api:
+    API.getBulkRequest: R
+    API.getMatomoVersion: R
+    SitesManager.getSiteUrlsFromId: RW
+    API.getWidgetMetadata: R
+  # For testing purposes only
+  test:
+    API.test: RW
+    API.testWrite: RW
+# Methods that won't require authorization (comment out to disable)
 publicMethods:
   - API.getBulkRequest
