@@ -5,6 +5,7 @@ const request = require('supertest');
 const querystring = require('querystring');
 const fetch = require('node-fetch');
 const app = require('../src/app').default;
+const messages = require('../src/utils/messages');
 
 const { Response, Headers } = jest.requireActual('node-fetch');
 
@@ -34,15 +35,16 @@ describe('api tests', () => {
 
   // avoid jest open handle error
   afterAll(async () => {
-    await new Promise((resolve) => setTimeout(() => resolve(), 500));
+    await new Promise(resolve => setTimeout(() => resolve(), 500));
   });
 
   it('test index', async () => {
     expect.assertions(2);
 
     const res = await request(app).get('/');
-    const response = { error: 'Failed to find credential' };
-    expect(res.status).toBe(403);
+    const response = { error: messages.default.errors.malformedParameters };
+
+    expect(res.status).toBe(400);
     expect(res.body).toStrictEqual(response);
   });
 
@@ -50,8 +52,9 @@ describe('api tests', () => {
     expect.assertions(2);
 
     const res = await request(app).get(`/?${queryParsed}`);
-    const response = { error: 'Failed to find credential' };
-    expect(res.status).toBe(403);
+    const response = { error: messages.default.errors.internalServerError };
+
+    expect(res.status).toBe(500);
     expect(res.body).toStrictEqual(response);
   });
 
@@ -71,7 +74,8 @@ describe('api tests', () => {
     const res = await request(app)
       .get(`/?${querystring.encode(testQuery)}`)
       .set('x-consumer-custom-id', JSON.stringify(customId));
-    const response = { error: `Can't access method '${testQuery.method}'` };
+    const response = { error: messages.default.errors.forbidden };
+
     expect(res.status).toBe(403);
     expect(res.body).toStrictEqual(response);
   });
@@ -88,9 +92,8 @@ describe('api tests', () => {
     const res = await request(app)
       .get(`/?${queryParsed}`)
       .set('x-consumer-custom-id', JSON.stringify(customId));
-    const response = {
-      error: `Not allowed to access method '${query.method}' with the current permission settings`,
-    };
+    const response = { error: messages.default.errors.forbidden };
+
     expect(res.status).toBe(403);
     expect(res.body).toStrictEqual(response);
   });
