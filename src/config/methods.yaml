@@ -11,6 +11,7 @@ enabled:
   test:
     API.test: RW
     API.testWrite: RW
-# Methods that won't require authorization (comment out to disable)
-publicMethods:
-  - API.getBulkRequest
+# API that won't require authorization (comment out to disable)
+public:
+  api:
+    - API.getBulkRequest
