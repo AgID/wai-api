@@ -1,41 +1,53 @@
 import config from '../../config/config';
+import messages from '../../utils/messages';
 
-export default (module, method, permission) => {
-  if (!module || !method) return { error: true, message: 'no Module or Method specified' };
+export default (queryModule, queryMethod, permission) => {
+  const error = {
+    error: true,
+    status: 403,
+    message: messages.errors.forbidden,
+  };
+
+  if (!queryModule || !queryMethod) {
+    error.message = messages.errors.malformedParameters;
+    return error;
+  }
 
   const matomoConfig = config.matomo;
 
-  const allowModule = Array.isArray(matomoConfig?.enabledModules?.module)
-    ? matomoConfig.enabledModules.module.find(
-      (elem) => elem.name.toLowerCase() === module.toLowerCase(),
-    )
-    : false;
+  if (!matomoConfig?.enabled || Object.keys(matomoConfig.enabled).length < 1) {
+    error.message = messages.errors.misconfiguredServer;
+    error.status = 500;
 
-  if (!allowModule) return { error: true, message: 'Module not allowed' };
-
-  const allowMethod = Array.isArray(allowModule?.methods)
-    ? allowModule?.methods.find((elem) => {
-      const elemMethod = elem.split('|');
-
-      return elemMethod[0].toLowerCase() === method.toLowerCase();
-    })
-    : false;
-
-  if (!allowMethod) return { error: true, message: 'Method not allowed' };
-
-  const getPermission = allowMethod ? allowMethod.split('|') : [];
-
-  const isAllowedPermission = permission === 'admin' || getPermission[1] === permission[0];
-
-  if (!isAllowedPermission) {
-    return {
-      error: true,
-      message:
-        `Not allowed to access the method '${
-          method
-        }' with the current permission settings`,
-    };
+    return error;
   }
 
-  return { error: false };
+  const moduleKey = Object.keys(matomoConfig.enabled).find(
+    elem => elem.toLowerCase() === queryModule.toLowerCase(),
+  );
+  const modulesList = matomoConfig.enabled[moduleKey];
+
+  if (!modulesList) {
+    error.error = true;
+
+    return error;
+  }
+
+  const methodKey = Object.keys(modulesList).find(
+    elem => elem.toLowerCase() === queryMethod.toLowerCase(),
+  );
+
+  if (!modulesList[methodKey]) {
+    error.error = true;
+
+    return error;
+  }
+
+  if (modulesList[methodKey] === permission || permission === 'admin' || permission === 'RW') {
+    error.error = false;
+  } else {
+    error.error = true;
+  }
+
+  return error;
 };
