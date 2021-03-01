@@ -47,11 +47,13 @@ export default async (req, res) => {
   const { method } = req;
   const url = process.env.ANALYTICS_PUBLIC_URL + encodeURI(params);
 
-  const results = await apiCall({ method, url, data: {} });
+  const response = await apiCall({ method, url, data: {} });
 
-  if (results.error) {
-    return res.status(results?.status || 200).json({ message: results.message });
+  if (response.error) {
+    return res.status(response.status).json(response.message
+      ? { message: response.message }
+      : response.results);
   }
 
-  return res.status(200).json(results);
+  return res.status(response.status).json(response.results);
 };
