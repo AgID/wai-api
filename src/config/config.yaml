@@ -7,11 +7,7 @@ enabled:
     API.getMatomoVersion: R
     SitesManager.getSiteUrlsFromId: RW
     API.getWidgetMetadata: R
-  # For testing purposes only
-  test:
-    API.test: RW
-    API.testWrite: RW
 # API that won't require authorization (comment out to disable)
 public:
   api:
-    - API.getBulkRequest
+    API.getBulkRequest: true

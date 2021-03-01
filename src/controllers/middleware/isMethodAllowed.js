@@ -15,13 +15,6 @@ export default (queryModule, queryMethod, permission) => {
 
   const matomoConfig = config.matomo;
 
-  if (!matomoConfig?.enabled || Object.keys(matomoConfig.enabled).length < 1) {
-    error.message = messages.errors.misconfiguredServer;
-    error.status = 500;
-
-    return error;
-  }
-
   const moduleKey = Object.keys(matomoConfig.enabled).find(
     elem => elem.toLowerCase() === queryModule.toLowerCase(),
   );

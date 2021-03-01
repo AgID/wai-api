@@ -5,6 +5,10 @@ import isMethodAllowed from './middleware/isMethodAllowed';
 import messages from '../utils/messages';
 
 export default async (req, res) => {
+  if (!config?.matomo?.enabled || Object.keys(config.matomo.enabled).length < 1) {
+    return res.status(500).json({ error: messages.errors.misconfiguredServer });
+  }
+
   if (typeof req.query?.module !== 'string' || typeof req.query?.method !== 'string') {
     return res.status(400).json({ error: messages.errors.malformedParameters });
   }
@@ -12,8 +16,9 @@ export default async (req, res) => {
   const queryModule = req.query.module;
   const queryMethod = req.query.method;
 
-  const isPubliclyAllowed = config.matomo.public[queryModule]?.[queryMethod] !== undefined;
-
+  const isPubliclyAllowed = config.matomo?.public
+    && config.matomo.public[queryModule]
+    && config.matomo.public[queryModule]?.[queryMethod] !== undefined;
   // eslint-disable-next-line radix
   const idSite = req.query?.idSite ? parseInt(req.query.idSite) : -1;
 
@@ -45,7 +50,7 @@ export default async (req, res) => {
   const results = await apiCall({ method, url, data: {} });
 
   if (results.error) {
-    return res.status(results?.status || 200).json({ error: results.message });
+    return res.status(results?.status || 200).json({ message: results.message });
   }
 
   return res.status(200).json(results);

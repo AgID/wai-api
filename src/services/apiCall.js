@@ -22,7 +22,7 @@ export default async ({ method, url, data }) => {
     });
     const contentType = results.headers.get('content-type');
 
-    if (contentType.includes('application/json')) {
+    if (contentType.includes('application/json') && results.ok) {
       response = results.json();
     } else {
       throw new Error('Response was not in JSON format');
