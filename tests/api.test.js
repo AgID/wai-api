@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const app = require('../src/app').default;
 const messages = require('../src/utils/messages');
 
-const { Response, Headers } = jest.requireActual('node-fetch');
+const { Response, Headers, FetchError } = jest.requireActual('node-fetch');
 
 describe('api tests', () => {
   let query;
@@ -247,13 +247,11 @@ describe('api tests', () => {
     expect.assertions(2);
 
     const response = {
-      error: true,
       message: 'Matomo Error',
-      status: 400,
     };
 
     const responseInit = {
-      status: 200,
+      status: 400,
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
@@ -272,7 +270,7 @@ describe('api tests', () => {
       .set('x-consumer-custom-id', JSON.stringify(customId));
 
     expect(res.status).toBe(400);
-    expect(res.body).toStrictEqual({ message: response.message });
+    expect(res.body).toStrictEqual(response);
   });
 
   it('request without siteId', async () => {
@@ -449,15 +447,16 @@ describe('api tests', () => {
   it('response not in json format', async () => {
     expect.assertions(2);
 
-    const response = `<html lang="en">
+    const response = `
+      <html lang="en">
         <head>
           <meta charset="utf-8">
           <title>HTML</title>
         </head>
         <body>
         </body>
-        </html>
-      `;
+      </html>
+    `;
 
     const responseInit = {
       status: 200,
@@ -478,7 +477,28 @@ describe('api tests', () => {
       .get(`/?${queryParsed}`)
       .set('x-consumer-custom-id', JSON.stringify(customId));
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(500);
     expect(res.body).toStrictEqual({ message: 'Response was not in JSON format' });
+  });
+
+  it('matomo fetch error', async () => {
+    expect.assertions(2);
+
+    fetch.mockRejectedValue(new FetchError('fetch error'));
+
+    customId.siteId = [];
+    customId.siteId.push({
+      id: 1,
+      permission: 'RW',
+    });
+
+    const res = await request(app)
+      .get(`/?${queryParsed}`)
+      .set('x-consumer-custom-id', JSON.stringify(customId));
+
+    expect(res.status).toBe(500);
+    expect(res.body).toStrictEqual({
+      message: 'Error in backend network',
+    });
   });
 });
