@@ -21,7 +21,7 @@ jobs:
           name: Test
           command: npm test
       - codecov/upload:
-          file: coverage/clover.xml
+          file: coverage/lcov.info
 
 workflows:
   build_and_test: 
