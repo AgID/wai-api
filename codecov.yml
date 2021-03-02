@@ -1,8 +1,8 @@
 coverage:
   status:
     project:
-      target: auto # auto % coverage target
-      threshold: 5%  # allow for 5% reduction of coverage without failing
+      target: 100
+      threshold: 0
     # do not run coverage on patch nor changes
     patch: off
     changes: off

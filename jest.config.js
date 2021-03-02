@@ -4,5 +4,5 @@ module.exports = {
   verbose: true,
   setupFilesAfterEnv: ['./jest.setup.js'],
   collectCoverage: true,
-  coverageReporters: ['text', 'clover'],
+  coverageReporters: ['text', 'lcov'],
 };

@@ -8,8 +8,9 @@ import fetch from 'node-fetch';
 export default async ({ method, url, data }) => {
   const hasBody = method !== 'GET' && method !== 'HEAD';
   let response;
+
   try {
-    const results = await fetch(url, {
+    response = await fetch(url, {
       method,
       cache: 'no-cache',
       credentials: 'same-origin',
@@ -20,18 +21,27 @@ export default async ({ method, url, data }) => {
       referrerPolicy: 'no-referrer',
       ...(hasBody && { body: JSON.stringify(data) }),
     });
-    const contentType = results.headers.get('content-type');
+    const contentType = response.headers.get('content-type');
 
-    if (contentType.includes('application/json')) {
-      response = results.json();
-    } else {
+    if (!contentType.includes('application/json')) {
       throw new Error('Response was not in JSON format');
     }
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.log(err.message || err);
-    response = { error: true, message: err.message || err, status: 400 };
+    console.log(err.message);
+
+    return {
+      status: 500,
+      error: true,
+      message: err.name === 'FetchError'
+        ? 'Error in backend network'
+        : err.message,
+    };
   }
 
-  return response;
+  return {
+    status: response.status,
+    error: !response.ok,
+    results: await response.json(),
+  };
 };
