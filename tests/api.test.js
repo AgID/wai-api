@@ -496,7 +496,7 @@ describe('api tests', () => {
       .get(`/?${queryParsed}`)
       .set('x-consumer-custom-id', JSON.stringify(customId));
 
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(503);
     expect(res.body).toStrictEqual({
       message: 'Error in backend network',
     });
