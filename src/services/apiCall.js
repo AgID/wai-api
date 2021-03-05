@@ -31,7 +31,9 @@ export default async ({ method, url, data }) => {
     console.log(err.message);
 
     return {
-      status: 503,
+      status: err.name === 'FetchError'
+        ? 503
+        : 500,
       error: true,
       message: err.name === 'FetchError'
         ? 'Error in backend network'
