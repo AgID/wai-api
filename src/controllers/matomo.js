@@ -43,7 +43,16 @@ export default async (req, res) => {
     }
   }
 
-  const params = req.originalUrl;
+  let params = req.originalUrl;
+
+  if (!req.query?.format) {
+    params = `${params}&format=JSON`;
+  } else if (typeof req.query.format !== 'string') {
+    return res.status(400).json({ error: messages.errors.malformedParameters });
+  } else if (req.query.format.toLowerCase() !== 'json') {
+    params = params.replace(/(\?|&)(format=\w+(?=&|$))/gi, '&format=JSON');
+  }
+
   const { method } = req;
   const url = process.env.ANALYTICS_PUBLIC_URL + encodeURI(params);
 
