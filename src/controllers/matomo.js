@@ -47,7 +47,7 @@ export default async (req, res) => {
 
   if (!req.query?.format) {
     params = `${params}&format=JSON`;
-  } else if (typeof req.query.format !== 'string' || (typeof req.query.format === 'string' && req.query.format.toLowerCase() !== 'json')) {
+  } else if (typeof req.query.format !== 'string' || req.query.format.toLowerCase() !== 'json') {
     return res.status(400).json({ error: messages.errors.malformedParameters });
   }
 
