@@ -501,4 +501,85 @@ describe('api tests', () => {
       message: 'Error in backend network',
     });
   });
+
+  it('malformed format in query string', async () => {
+    expect.assertions(2);
+
+    const response = {
+      error: messages.default.errors.malformedParameters,
+    };
+
+    const queryTest = { ...query, format: ['JSON', 'JSON'] };
+    const queryTestParsed = querystring.encode(queryTest);
+
+    customId.siteId = [];
+    customId.siteId.push({
+      id: 1,
+      permission: 'RW',
+    });
+
+    const res = await request(app)
+      .get(`/?${queryTestParsed}`)
+      .set('x-consumer-custom-id', JSON.stringify(customId));
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual(response);
+  });
+
+  it('forbidden format in query string', async () => {
+    expect.assertions(2);
+
+    const response = {
+      error: messages.default.errors.malformedParameters,
+    };
+
+    const queryTest = { ...query, format: 'XML' };
+    const queryTestParsed = querystring.encode(queryTest);
+
+    customId.siteId = [];
+    customId.siteId.push({
+      id: 1,
+      permission: 'RW',
+    });
+
+    const res = await request(app)
+      .get(`/?${queryTestParsed}`)
+      .set('x-consumer-custom-id', JSON.stringify(customId));
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual(response);
+  });
+
+  it('missing format param in query string is added', async () => {
+    expect.assertions(2);
+
+    const response = {
+      requestedKey: 'requestedValue',
+    };
+
+    const responseInit = {
+      status: 200,
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    };
+
+    fetch.mockReturnValue(Promise.resolve(new Response(JSON.stringify(response), responseInit)));
+
+    const { format, ...queryTest } = { ...query };
+    const queryTestParsed = querystring.encode(queryTest);
+
+    customId.siteId = [];
+    customId.siteId.push({
+      id: 1,
+      permission: 'RW',
+    });
+
+    const res = await request(app)
+      .get(`/?${queryTestParsed}`)
+      .set('x-consumer-custom-id', JSON.stringify(customId));
+
+    expect(res.status).toBe(200);
+    expect(res.body).toStrictEqual(response);
+  });
 });
