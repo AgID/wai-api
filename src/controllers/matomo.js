@@ -9,7 +9,10 @@ export default async (req, res) => {
     return res.status(500).json({ error: messages.errors.misconfiguredServer });
   }
 
-  if (typeof req.query?.module !== 'string' || typeof req.query?.method !== 'string') {
+  if (typeof req.query?.module !== 'string'
+      || typeof req.query?.method !== 'string'
+      || typeof req.query?.trigger === 'string'
+      || typeof req.query?.token_auth === 'string') {
     return res.status(400).json({ error: messages.errors.malformedParameters });
   }
 
@@ -52,7 +55,7 @@ export default async (req, res) => {
   }
 
   const { method } = req;
-  const url = process.env.ANALYTICS_PUBLIC_URL + encodeURI(params);
+  const url = `${process.env.MATOMO_SERVICE_URL}${encodeURI(params)}&token_auth=${process.env.MATOMO_ADMIN_TOKEN_AUTH}`;
 
   const response = await apiCall({ method, url, data: {} });
 

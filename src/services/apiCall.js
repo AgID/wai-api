@@ -1,24 +1,21 @@
 import fetch from 'node-fetch';
+
 /**
  * @param  {string} method
  * @param  {string} url
  * @param  {object} data
  */
-
 export default async ({ method, url, data }) => {
-  const hasBody = method !== 'GET' && method !== 'HEAD';
+  const hasBody = !['GET', 'HEAD', 'DELETE', 'OPTIONS'].includes(method.toUpperCase());
   let response;
 
   try {
     response = await fetch(url, {
       method,
-      cache: 'no-cache',
-      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      referrerPolicy: 'no-referrer',
       ...(hasBody && { body: JSON.stringify(data) }),
     });
     const contentType = response.headers.get('content-type');

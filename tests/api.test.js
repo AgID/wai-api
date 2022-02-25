@@ -23,7 +23,6 @@ describe('api tests', () => {
       method: 'api.test',
       idSite: '1',
       format: 'JSON',
-      token_auth: 'anonymous',
     };
 
     customId = {
@@ -510,6 +509,54 @@ describe('api tests', () => {
     };
 
     const queryTest = { ...query, format: ['JSON', 'JSON'] };
+    const queryTestParsed = querystring.encode(queryTest);
+
+    customId.siteId = [];
+    customId.siteId.push({
+      id: 1,
+      permission: 'RW',
+    });
+
+    const res = await request(app)
+      .get(`/?${queryTestParsed}`)
+      .set('x-consumer-custom-id', JSON.stringify(customId));
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual(response);
+  });
+
+  it('forbidden trigger param in query string', async () => {
+    expect.assertions(2);
+
+    const response = {
+      error: messages.default.errors.malformedParameters,
+    };
+
+    const queryTest = { ...query, trigger: 'archivephp' };
+    const queryTestParsed = querystring.encode(queryTest);
+
+    customId.siteId = [];
+    customId.siteId.push({
+      id: 1,
+      permission: 'RW',
+    });
+
+    const res = await request(app)
+      .get(`/?${queryTestParsed}`)
+      .set('x-consumer-custom-id', JSON.stringify(customId));
+
+    expect(res.status).toBe(400);
+    expect(res.body).toStrictEqual(response);
+  });
+
+  it('forbidden token_auth param in query string', async () => {
+    expect.assertions(2);
+
+    const response = {
+      error: messages.default.errors.malformedParameters,
+    };
+
+    const queryTest = { ...query, token_auth: 'stolen_token' };
     const queryTestParsed = querystring.encode(queryTest);
 
     customId.siteId = [];
