@@ -15,6 +15,8 @@ services:
       context: .
     ports:
       - "${PORT_PROD}:${PORT_PROD}"
+    environment:
+      - MATOMO_ADMIN_TOKEN_AUTH=${MATOMO_ADMIN_TOKEN_AUTH}
     networks:
       - frontend
       - backend
