@@ -10,7 +10,7 @@ ENV NODE_ENV=production
 
 WORKDIR /home/node/app
 
-COPY . .
+COPY . ./
 COPY --from=deps /home/node/app/node_modules ./node_modules
 
 RUN npm run build
@@ -19,15 +19,11 @@ FROM node:lts-alpine AS runner
 
 WORKDIR /home/node/app
 
-ENV PORT_PROD=7080
-ENV NODE_ENV=production
-ENV MATOMO_SERVICE_URL=https://nginx:9443
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
-
 EXPOSE 7080
 
+COPY .env ./
 COPY --from=builder /home/node/app/dist ./dist
-COPY --from=builder /home/node/app/node_modules ./node_modules
+COPY --from=deps /home/node/app/node_modules ./node_modules
 COPY --from=deps /home/node/app/package.json ./
 
 CMD [ "node", "./dist/index.js" ]
