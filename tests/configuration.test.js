@@ -26,7 +26,6 @@ describe('test configurations', () => {
       method: 'api.test',
       idSite: '1',
       format: 'JSON',
-      token_auth: 'anonymous',
     };
 
     customId = {
