@@ -55,7 +55,7 @@ export default async (req, res) => {
   }
 
   const { method } = req;
-  const url = process.env.ANALYTICS_PUBLIC_URL + encodeURI(params);
+  const url = `${process.env.MATOMO_SERVICE_URL}${encodeURI(params)}&token_auth=${process.env.MATOMO_ADMIN_TOKEN_AUTH}`;
 
   const response = await apiCall({ method, url, data: {} });
 
