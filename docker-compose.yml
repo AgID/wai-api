@@ -1,0 +1,22 @@
+version: "3.7"
+
+networks:
+  frontend:
+    external: true
+    name: wai_frontend
+  backend:
+    external: true
+    name: wai_backend
+
+services:
+  express:
+    image: wai-express-api:dev
+    build:
+      context: .
+    ports:
+      - "${PORT_PROD}:${PORT_PROD}"
+    environment:
+      - MATOMO_ADMIN_TOKEN_AUTH=${MATOMO_ADMIN_TOKEN_AUTH}
+    networks:
+      - frontend
+      - backend
