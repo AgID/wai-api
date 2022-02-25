@@ -9,7 +9,10 @@ export default async (req, res) => {
     return res.status(500).json({ error: messages.errors.misconfiguredServer });
   }
 
-  if (typeof req.query?.module !== 'string' || typeof req.query?.method !== 'string') {
+  if (typeof req.query?.module !== 'string'
+      || typeof req.query?.method !== 'string'
+      || typeof req.query?.trigger === 'string'
+      || typeof req.query?.token_auth === 'string') {
     return res.status(400).json({ error: messages.errors.malformedParameters });
   }
 
